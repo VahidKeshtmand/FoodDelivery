@@ -1,0 +1,19 @@
+﻿using User.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace User.Persistence.Configurations;
+
+/// <summary>
+/// Entity Framework Core configuration for the <see cref="UserRole"/> entity.
+/// Configures the user-role relationship and other relevant properties.
+/// </summary>
+internal sealed class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
+{
+    public void Configure(EntityTypeBuilder<UserRole> builder) {
+
+        builder.ToTable("UserRoles");
+
+        builder.HasKey(x => new { x.UserId, x.RoleId });
+    }
+}
