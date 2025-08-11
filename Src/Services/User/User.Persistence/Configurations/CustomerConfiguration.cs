@@ -24,6 +24,9 @@ internal sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
     public void Configure(EntityTypeBuilder<Customer> builder) {
         builder.ToTable("Customers");
 
+        builder.HasQueryFilter(x =>
+            x.Addresses.Any(y => !y.IsDeleted));
+
         builder.OwnsMany(x => x.Addresses, x => {
             x.Property(y => y.Street)
                 .HasMaxLength(100);
