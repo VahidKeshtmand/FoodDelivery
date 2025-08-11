@@ -45,28 +45,40 @@ public abstract class UserAccount : IdentityUser<int>, ISoftDeleteBaseEntity
     {
         UserRoles.Add(role);
     }
-
     #region BaseEntity
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the date and time when the entity was created.
+    /// </summary>
     public DateTime Created { get; private set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the ID of the user who created the entity.
+    /// </summary>
     public int? CreatedBy { get; private set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the date and time when the entity was last updated.
+    /// </summary>
     public DateTime? LastUpdated { get; private set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the ID of the user who last updated the entity.
+    /// </summary>
     public int? LastUpdatedBy { get; private set; }
 
-    /// <inheritdoc/>
-    public void Update(int userId)
-    {
+    /// <summary>
+    /// Updates the audit fields for modification using the given user ID.
+    /// </summary>
+    /// <param name="userId">The ID of the user performing the update.</param>
+    public void Update(int userId) {
         LastUpdated = DateTime.Now;
         LastUpdatedBy = userId;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Sets the audit fields for creation using the given user ID.
+    /// </summary>
+    /// <param name="userId">The ID of the user performing the creation.</param>
     public void Create(int userId) {
         Created = DateTime.Now;
         CreatedBy = userId;
@@ -74,16 +86,25 @@ public abstract class UserAccount : IdentityUser<int>, ISoftDeleteBaseEntity
     #endregion
 
     #region SoftDeleteBaseEntity
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets a value indicating whether the entity has been marked as deleted.
+    /// </summary>
     public bool IsDeleted { get; private set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the date and time when the entity was deleted, if applicable.
+    /// </summary>
     public DateTime? Deleted { get; private set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the ID of the user who deleted the entity, if applicable.
+    /// </summary>
     public int? DeletedBy { get; private set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Marks the entity as deleted and sets the deletion audit fields.
+    /// </summary>
+    /// <param name="userId">The ID of the user performing the deletion.</param>
     public void Delete(int userId) {
         IsDeleted = true;
         Deleted = DateTime.Now;

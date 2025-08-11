@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using User.Application.Interfaces;
+using User.Application.Options;
 using User.Persistence.DbContexts;
 using User.Persistence.Repositories;
 using User.Persistence.SeedDatas;
@@ -13,19 +14,19 @@ public static class DependencyInjection
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration) {
 
         //برای استفاده از Get<> پکیج Microsoft.Extensions.Configuration.Binder نصب شود
-        //var dbOptions = configuration.GetSection(nameof(DatabaseOptions)).Get<DatabaseOptions>() ?? new DatabaseOptions();
-         
-        //services.AddDbContext<AppDbContext>(options => {
-        //    if ( dbOptions.UseInMemoryDatabase ) {
-        //        options.UseInMemoryDatabase("AppDb");
-        //    } else {
-        //        options.UseSqlServer(dbOptions.ConnectionStrings.AppDbContext);
-        //    }
-        //});
+        var dbOptions = configuration.GetSection(nameof(DatabaseOptions)).Get<DatabaseOptions>() ?? new DatabaseOptions();
 
-        //services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
-        //services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-        //services.AddScoped<IRunSeedData, RunRolesSeedData>();
+        services.AddDbContext<AppDbContext>(options => {
+            if ( dbOptions.UseInMemoryDatabase ) {
+                options.UseInMemoryDatabase("AppDb");
+            } else {
+                options.UseSqlServer(dbOptions.ConnectionStrings.AppDbContext);
+            }
+        });
+
+        services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<IRunSeedData, RunRolesSeedData>();
 
         return services;
     }

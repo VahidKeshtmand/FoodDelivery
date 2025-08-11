@@ -40,6 +40,10 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                     responseObject.Errors = commandFailedException.Values;
                 }
 
+                if ( commandFailedException.Errors is not null && commandFailedException.Errors.Any() ) {
+                    responseObject.Errors = commandFailedException.Errors;
+                }
+
                 break;
 
             case UnAuthorizedException unAuthorizedException:

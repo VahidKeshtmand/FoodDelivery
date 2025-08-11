@@ -1,56 +1,49 @@
-﻿using AutoMapper;
-using User.Application.Common.Exceptions;
-using User.Application.Common.Models.BaseDtos;
-using User.Application.Common.StaticDatas;
-using User.Application.Interfaces;
-using User.Application.Options;
+﻿using User.Application.Common.Models.BaseDtos;
 using User.Domain.Entities;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 
 namespace User.Application.Features.Accounts.Commands;
 
-/// <summary>
-/// ثبت نام کاربر
-/// </summary>
-public sealed record RegisterUserCommand : BaseCommandDto<RegisterUserCommand, User>, IRequest<int>
-{
-    /// <summary>
-    /// نام
-    /// </summary>
-    public string FirstName { get; init; }
+///// <summary>
+///// ثبت نام کاربر
+///// </summary>
+//public sealed record RegisterUserCommand : BaseCommandDto<RegisterUserCommand, UserAccount>, IRequest<int>
+//{
+//    /// <summary>
+//    /// نام
+//    /// </summary>
+//    public string FirstName { get; init; }
 
-    /// <summary>
-    /// نام خانوادگی
-    /// </summary>
-    public string LastName { get; init; }
+//    /// <summary>
+//    /// نام خانوادگی
+//    /// </summary>
+//    public string LastName { get; init; }
 
-    /// <summary>
-    /// کد ملی
-    /// </summary>
-    public string NationalId { get; init; }
+//    /// <summary>
+//    /// کد ملی
+//    /// </summary>
+//    public string NationalId { get; init; }
 
-    /// <summary>
-    /// ایمیل
-    /// </summary>
-    public string Email { get; init; }
+//    /// <summary>
+//    /// ایمیل
+//    /// </summary>
+//    public string Email { get; init; }
 
-    /// <summary>
-    /// شماره موبایل
-    /// </summary>
-    public string PhoneNumber { get; init; }
+//    /// <summary>
+//    /// شماره موبایل
+//    /// </summary>
+//    public string PhoneNumber { get; init; }
 
-    /// <summary>
-    /// پسورد
-    /// </summary>
-    public string Password { get; init; }
+//    /// <summary>
+//    /// پسورد
+//    /// </summary>
+//    public string Password { get; init; }
 
-    /// <summary>
-    /// تکرار پسورد
-    /// </summary>
-    public string RePassword { get; init; }
-}
+//    /// <summary>
+//    /// تکرار پسورد
+//    /// </summary>
+//    public string RePassword { get; init; }
+//}
 
 //internal sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, int>
 //{

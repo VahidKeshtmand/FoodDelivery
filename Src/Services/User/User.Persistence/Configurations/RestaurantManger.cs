@@ -9,12 +9,16 @@ namespace User.Persistence.Configurations;
 /// Entity Framework Core configuration for the <see cref="RestaurantManger"/> entity.
 /// Inherits soft delete base configuration.
 /// </summary>
-internal sealed class RestaurantMangerConfiguration : SoftDeleteBaseEntityConfiguration<RestaurantManger>
+internal sealed class RestaurantMangerConfiguration : IEntityTypeConfiguration<RestaurantManger>
 {
-    public override void Configure(EntityTypeBuilder<RestaurantManger> builder)
-    {
-        base.Configure(builder);
-
+    public void Configure(EntityTypeBuilder<RestaurantManger> builder) {
+       
         builder.ToTable("RestaurantMangers");
     }
+    //public override void Configure(EntityTypeBuilder<RestaurantManger> builder)
+    //{
+    //    base.Configure(builder);
+
+    //    builder.ToTable("RestaurantMangers");
+    //}
 }

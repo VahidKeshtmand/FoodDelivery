@@ -1,8 +1,12 @@
-﻿namespace User.Application.Common.Exceptions;
+﻿using User.Application.Common.Models;
 
-public class CommandFailedException : Exception 
+namespace User.Application.Common.Exceptions;
+
+public class CommandFailedException : Exception
 {
     public Dictionary<string, string>? Values { get; private set; }
+
+    public List<ValidationErrorModel>? Errors { get; private set; }
 
     public CommandFailedException() : base("خطا در انجام عملیات") {
 
@@ -20,5 +24,7 @@ public class CommandFailedException : Exception
         Values = values;
     }
 
-    
+    public CommandFailedException(List<ValidationErrorModel> error) : base("Validation Error Occurred") {
+        Errors = error;
+    }
 }

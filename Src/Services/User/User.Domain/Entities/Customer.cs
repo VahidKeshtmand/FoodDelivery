@@ -1,6 +1,4 @@
-﻿using User.Domain.Common;
-
-namespace User.Domain.Entities;
+﻿namespace User.Domain.Entities;
 
 /// <summary>
 /// Represents a customer user in the system,
@@ -19,5 +17,3 @@ public sealed class Customer : UserAccount
     /// </summary>
     public required DateTime BirthDate { get; set; }
 }
-
-

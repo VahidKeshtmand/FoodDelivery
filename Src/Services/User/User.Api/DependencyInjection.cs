@@ -1,23 +1,28 @@
-﻿using User.Application.Common.Models;
-using User.Application.Common.Utilities;
-using User.Domain.Entities;
-using User.Persistence.DbContexts;
+﻿using AutoMapper;
 //using FluentValidation.AspNetCore;
 using FluentValidation;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using System.Globalization;
-using AutoMapper;
-using System.Reflection;
-using User.Application.Common.Mappings;
-using User.Application.Common.Models.BaseDtos;
 //using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.Security.Claims;
 //using User.Endpoint.ExceptionHandler;
 using Microsoft.OpenApi.Models;
-using User.Application.Options;
+using System.Globalization;
+using System.Reflection;
+using System.Security.Claims;
+using System.Text;
+using User.Api.ExceptionHandler;
+using User.Application.Behaviors;
+using User.Application.Common.Mappings;
+using User.Application.Common.Models;
+using User.Application.Common.Models.BaseDtos;
+using User.Application.Common.Options;
 using User.Application.Common.StaticDatas;
+using User.Application.Common.Utilities;
+using User.Application.Options;
+using User.Domain.Entities;
+using User.Persistence.DbContexts;
 //using Carter;
 
 namespace User.Api;
@@ -34,7 +39,8 @@ public static class DependencyInjection
     /// <param name="configuration"></param>
     /// <param name="assemblies"></param>
     /// <returns></returns>
-    public static IServiceCollection AddEndpointServices(this IServiceCollection services, IConfiguration configuration, params Assembly[] assemblies) {
+    public static IServiceCollection AddEndpointServices(this IServiceCollection services, IConfiguration configuration, params Assembly[] assemblies)
+    {
 
         services.AddHttpContextAccessor();
 
@@ -43,58 +49,61 @@ public static class DependencyInjection
         services.AddMemoryCache();
 
         #region Register ExceptionHandler
-        //services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
         #endregion
 
         #region Register MediatR
-        services.AddMediatR(opts => opts.RegisterServicesFromAssemblyContaining<IBaseDto>());
+        services.AddMediatR(opts =>
+        {
+            opts.RegisterServicesFromAssemblyContaining<IBaseDto>();
+            opts.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        });
         #endregion
 
         #region Register FluentValidation
-        //services.AddFluentValidationAutoValidation(fv => {
-        //    fv.DisableDataAnnotationsValidation = true;
-        //})
-        //.AddValidatorsFromAssemblyContaining(typeof(BaseValidator<>));
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
+        .AddValidatorsFromAssemblyContaining(typeof(BaseValidator<>));
 
         ValidatorOptions.Global.LanguageManager.Enabled = true;
         ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("fa");
         #endregion
 
         #region Register AutoMapper
-        services.AddAutoMapper(config => {
+        services.AddAutoMapper(config =>
+        {
             config.AddCustomMappingProfile();
         }, assemblies);
         #endregion
 
         #region Register Identity
-        var identityOptions = configuration.GetSection(nameof(IdentitySettingsOptions)).Get<IdentitySettingsOptions>() ?? new();
+        var identityOptions = configuration.GetSection(nameof(IdentitySettingsOptions)).Get<IdentitySettingsOptions>() ?? new IdentitySettingsOptions();
 
-        //services.AddIdentity<User, Role>(options => {
-        //    options.User.RequireUniqueEmail = identityOptions.RequireUniqueEmail;
-        //    options.Password.RequireDigit = identityOptions.PasswordRequireDigit;
-        //    options.Password.RequiredLength = identityOptions.PasswordRequiredLength;
-        //    options.Password.RequireNonAlphanumeric = identityOptions.PasswordRequireNonAlphanumeric;
-        //    options.Password.RequireUppercase = identityOptions.PasswordRequireUppercase;
-        //    options.Password.RequireLowercase = identityOptions.PasswordRequireLowercase;
+        services.AddIdentity<UserAccount, Role>(options => {
+            options.User.RequireUniqueEmail = identityOptions.RequireUniqueEmail;
+            options.Password.RequireDigit = identityOptions.PasswordRequireDigit;
+            options.Password.RequiredLength = identityOptions.PasswordRequiredLength;
+            options.Password.RequireNonAlphanumeric = identityOptions.PasswordRequireNonAlphanumeric;
+            options.Password.RequireUppercase = identityOptions.PasswordRequireUppercase;
+            options.Password.RequireLowercase = identityOptions.PasswordRequireLowercase;
 
-        //}).AddEntityFrameworkStores<AppDbContext>()
-        //.AddDefaultTokenProviders()
-        //.AddErrorDescriber<CustomIdentityError>()
-        //.AddRoles<Role>();
+        }).AddEntityFrameworkStores<AppDbContext>()
+        .AddDefaultTokenProviders()
+        .AddErrorDescriber<CustomIdentityError>()
+        .AddRoles<Role>();
         #endregion
 
         #region Register Authentication And JwtBearer       
-        //services.AddAuthentication(options => {
-        //    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        //    options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-        //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        services.AddAuthentication(options => {
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
-        //}).AddJwtBearer(options => {
-        //    options.TokenValidationParameters = GenerateTokenValidationParameters(configuration);
-        //    options.Events = GenerateJwtBearerEvents();
-        //});
+        }).AddJwtBearer(options => {
+            options.TokenValidationParameters = GenerateTokenValidationParameters(configuration);
+            options.Events = GenerateJwtBearerEvents();
+        });
         #endregion
 
         #region Register MinimalApi Authorization Policies
@@ -115,6 +124,17 @@ public static class DependencyInjection
         //});
         #endregion
 
+        #region Congigure Options
+        services.Configure<DatabaseOptions>(configuration.GetSection(nameof(DatabaseOptions)));
+        services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
+        services.Configure<IdentitySettingsOptions>(configuration.GetSection(nameof(IdentitySettingsOptions)));
+        services.Configure<SwaggerOptions>(configuration.GetSection(nameof(SwaggerOptions)));
+        services.Configure<TemplateBackgroundServiceOptions>(configuration.GetSection(nameof(TemplateBackgroundServiceOptions)));
+        services.Configure<InMemoryCacheOptions>(configuration.GetSection(nameof(InMemoryCacheOptions)));
+        services.Configure<BaseExternalServiceOptions>(configuration.GetSection(nameof(BaseExternalServiceOptions)));
+        services.Configure<TemplateExternalServiceOptions>(configuration.GetSection(nameof(TemplateExternalServiceOptions))); 
+        #endregion
+
         return services;
     }
 
@@ -123,7 +143,8 @@ public static class DependencyInjection
     /// AddCustomMappingProfile
     /// </summary>
     /// <param name="config"></param>
-    public static void AddCustomMappingProfile(this IMapperConfigurationExpression config) {
+    public static void AddCustomMappingProfile(this IMapperConfigurationExpression config)
+    {
         var assemblies = new Assembly[] { typeof(IMapping).Assembly };
 
         var allTypes = assemblies.SelectMany(a => a.ExportedTypes);
@@ -139,49 +160,51 @@ public static class DependencyInjection
     #endregion
 
     #region Register Authentication And JwtBearer Methods
-    //private static JwtBearerEvents GenerateJwtBearerEvents() {
+    private static JwtBearerEvents GenerateJwtBearerEvents() {
 
-    //    return new JwtBearerEvents {
+        return new JwtBearerEvents {
 
-    //        OnAuthenticationFailed = context => {
-    //            var logger = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(JwtBearerEvents));
-    //            logger.LogError("Authentication Failed. {exception}", context.Exception.Message);
+            OnAuthenticationFailed = context => {
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(JwtBearerEvents));
+                logger.LogError("Authentication Failed. {exception}", context.Exception.Message);
 
-    //            if ( context.Exception != null ) {
-    //                context.Fail("Authentication Failed");
-    //            }
+                if ( context.Exception != null ) {
+                    context.Fail("Authentication Failed");
+                }
 
-    //            return Task.CompletedTask;
-    //        },
+                return Task.CompletedTask;
+            },
 
-    //        OnTokenValidated = context => {
+            OnTokenValidated = context => {
 
-    //            var claims = context.Principal?.Identity as ClaimsIdentity;
-    //            if ( claims == null || !claims.Claims.Any() ) {
-    //                context.Fail("Claims not found");
-    //            }
+                var claims = context.Principal?.Identity as ClaimsIdentity;
+                if ( claims == null || !claims.Claims.Any() ) {
+                    context.Fail("Claims not found");
+                }
 
-    //            var userId = claims?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
-    //            if ( !int.TryParse(userId, out var intUserId) || intUserId <= 0 ) {
-    //                context.Fail("Claims not found");
-    //            }
+                var userId = claims?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+                if ( !int.TryParse(userId, out var intUserId) || intUserId <= 0 ) {
+                    context.Fail("Claims not found");
+                }
 
-    //            return Task.CompletedTask;
-    //        },
+                return Task.CompletedTask;
+            },
 
-    //        OnChallenge = context => {
-    //            var logger = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(JwtBearerEvents));
-    //            logger.LogError("OnChallenge error. Error: {Error}\nDescription: {Description}", context.Error, context.ErrorDescription);
-    //            return Task.CompletedTask;
-    //        }
-    //    };
-    //}
+            OnChallenge = context => {
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(JwtBearerEvents));
+                logger.LogError("OnChallenge error. Error: {Error}\nDescription: {Description}", context.Error, context.ErrorDescription);
+                return Task.CompletedTask;
+            }
+        };
+    }
 
-    private static TokenValidationParameters GenerateTokenValidationParameters(IConfiguration configuration) {
+    private static TokenValidationParameters GenerateTokenValidationParameters(IConfiguration configuration)
+    {
 
         var jwtOptions = configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>() ?? new();
 
-        return new TokenValidationParameters {
+        return new TokenValidationParameters
+        {
 
             ValidIssuer = jwtOptions.Issuer,
             ValidAudience = jwtOptions.Audience,
@@ -193,37 +216,43 @@ public static class DependencyInjection
     #endregion
 
     #region Register SwaggerGen Methods
-    private static OpenApiSecurityScheme GenerateOpenApiSecurityScheme() {
+    private static OpenApiSecurityScheme GenerateOpenApiSecurityScheme()
+    {
 
-        return new OpenApiSecurityScheme {
+        return new OpenApiSecurityScheme
+        {
             Name = "Jwt Auth",
             Description = "Type into the textbox your JWT token.",
             In = ParameterLocation.Header,
             Type = SecuritySchemeType.Http,
             Scheme = "bearer",
             BearerFormat = "JWT",
-            Reference = new OpenApiReference {
-                //Id = JwtBearerDefaults.AuthenticationScheme,
+            Reference = new OpenApiReference
+            {
+                Id = JwtBearerDefaults.AuthenticationScheme,
                 Type = ReferenceType.SecurityScheme
             }
         };
     }
 
-    private static OpenApiSecurityRequirement GenerateOpenApiSecurityRequirement() {
+    //private static OpenApiSecurityRequirement GenerateOpenApiSecurityRequirement()
+    //{
 
-        return new OpenApiSecurityRequirement {
-            { GenerateOpenApiSecurityScheme(), new string[]{} }
-        };
-    }
+    //    return new OpenApiSecurityRequirement {
+    //        { GenerateOpenApiSecurityScheme(), new string[]{} }
+    //    };
+    //}
 
-    private static OpenApiInfo GenerateOpenApiInfo(IConfiguration configuration) {
+    //private static OpenApiInfo GenerateOpenApiInfo(IConfiguration configuration)
+    //{
 
-        var swaggerOptions = configuration.GetSection(nameof(SwaggerOptions)).Get<SwaggerOptions>() ?? new();
+    //    var swaggerOptions = configuration.GetSection(nameof(SwaggerOptions)).Get<SwaggerOptions>() ?? new();
 
-        return new OpenApiInfo {
-            Title = swaggerOptions.Title,
-            Description = swaggerOptions.Description,
-        };
-    }
+    //    return new OpenApiInfo
+    //    {
+    //        Title = swaggerOptions.Title,
+    //        Description = swaggerOptions.Description,
+    //    };
+    //}
     #endregion
 }
