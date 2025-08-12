@@ -1,5 +1,4 @@
-﻿using User.Domain.Common;
-using User.Domain.ValueObjects;
+﻿using User.Domain.ValueObjects;
 
 namespace User.Domain.Entities;
 
@@ -9,7 +8,7 @@ namespace User.Domain.Entities;
 public sealed class Address
 {
     /// <summary>
-    /// 
+    /// Gets or sets the id of the address.
     /// </summary>
     public int Id { get; set; }
 

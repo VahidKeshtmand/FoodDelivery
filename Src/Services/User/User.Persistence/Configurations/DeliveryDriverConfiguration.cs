@@ -1,5 +1,4 @@
-﻿using User.Persistence.Configurations.BaseConfigurations;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using User.Domain.Entities;
 
@@ -7,28 +6,53 @@ namespace User.Persistence.Configurations;
 
 /// <summary>
 /// Entity Framework Core configuration for the <see cref="DeliveryDriver"/> entity.
-/// Inherits soft delete base configuration.
 /// </summary>
-internal sealed class DeliveryDriverConfiguration : IEntityTypeConfiguration<DeliveryDriver> //SoftDeleteBaseEntityConfiguration<DeliveryDriver>
+internal sealed class DeliveryDriverConfiguration : IEntityTypeConfiguration<DeliveryDriver>
 {
-    //public override void Configure(EntityTypeBuilder<DeliveryDriver> builder) {
-
-    //    base.Configure(builder);
-
-    //    builder.ToTable("DeliveryDrivers");
-
-
-
-    //    //اگر OnDelete رو ست نکنیم EFCore براساس optional بودن یا نبودن کلید خارجی تصمیم می گیرد که از کدام یک از حالت ها استفاده کند
-    //    //اگر relation اجباری بود از نوع Cascade
-    //    //اگر relation اجباری بود از نوع اختیاری بود یعنی کلید خارجی nullable بود از نوع ClientSetNull 
-
-    //    //Cascade با حذف Parent تمامی child ها حذف می شوند
-    //    //ClientSetNull با حذف Parent تمامی Child ها کلید خاجی شان توسط EFCore Null ست می شود
-    //}
-
     public void Configure(EntityTypeBuilder<DeliveryDriver> builder) {
         builder.ToTable("DeliveryDrivers");
+
+        builder.Property(x => x.LicensePlateNumber)
+            .HasMaxLength(50)
+            .IsRequired();
+
+        builder.Property(x => x.FirstName)
+            .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property(x => x.LastName)
+            .HasMaxLength(200)
+            .IsRequired();
+
+        builder.Property(x => x.UserName)
+            .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property(x => x.Email)
+            .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property(x => x.NormalizedEmail)
+            .HasMaxLength(100);
+
+        builder.Property(x => x.PasswordHash)
+            .HasMaxLength(1000)
+            .IsRequired();
+
+        builder.Property(x => x.SecurityStamp)
+            .HasMaxLength(2000);
+
+        builder.Property(x => x.ConcurrencyStamp)
+            .HasMaxLength(2000);
+
+        builder.Property(x => x.PhoneNumber)
+            .HasMaxLength(11)
+            .IsRequired();
+
+        builder.HasMany(e => e.UserRoles)
+            .WithOne(x => x.DeliveryDriver)
+            .HasForeignKey(x => x.DeliveryDriverId)
+            .IsRequired();
 
         builder.OwnsOne(x => x.Location);
     }

@@ -3,34 +3,35 @@
 namespace User.Domain.Entities;
 
 /// <summary>
-/// توکن کاربر
+/// Represents a refresh token used for renewing authentication tokens in the system.
+/// Contains information about the token value, its expiration, usage status, and the associated user.
 /// </summary>
 public sealed class RefreshToken : BaseEntity
 {
     /// <summary>
-    /// رفرش توکن
+    /// The unique string value of the refresh token.
     /// </summary>
     public string Token { get; set; }
 
     /// <summary>
-    /// تاریخ انقضای رفرش توکن
+    /// The date and time when the refresh token expires.
     /// </summary>
     public DateTime ExpirationDate { get; set; }
 
     /// <summary>
-    /// آیا رفرش توکن قبلا استفاده شده؟
+    /// Indicates whether the refresh token has already been used.
     /// </summary>
-    public bool Used { get; set; }
+    public bool IsUsed { get; set; }
 
     /// <summary>
-    /// شناسه کاربر
+    /// The identifier of the user to whom this refresh token belongs.
     /// </summary>
     public int UserId { get; set; }
 
     /// <summary>
-    /// توکن استفاده شده
+    /// Marks the refresh token as used.
     /// </summary>
     public void UseToken() {
-        Used = true;
+        IsUsed = true;
     }
 }

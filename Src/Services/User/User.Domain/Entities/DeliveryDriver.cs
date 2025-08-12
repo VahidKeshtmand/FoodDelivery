@@ -1,5 +1,4 @@
-﻿using User.Domain.Common;
-using User.Domain.Enums;
+﻿using User.Domain.Enums;
 using User.Domain.ValueObjects;
 
 namespace User.Domain.Entities;
@@ -9,7 +8,7 @@ namespace User.Domain.Entities;
 /// extending <see cref="UserAccount"/> and supporting soft deletion.
 /// Includes properties related to vehicle, license, availability, and location.
 /// </summary>
-public sealed class DeliveryDriver : UserAccount, ISoftDeleteBaseEntity
+public sealed class DeliveryDriver : UserAccount
 {
     /// <summary>
     /// Gets or sets the type of vehicle the driver uses.

@@ -4,12 +4,14 @@ using User.Domain.Common;
 namespace User.Domain.Entities;
 
 /// <summary>
-/// موجودیت نقش کاربر
+/// Represents an application role with support for soft deletion and auditing.
+/// Inherits from <see cref="IdentityRole{TKey}"/> and implements <see cref="ISoftDeleteBaseEntity"/>.
+/// Each role can be assigned to multiple users through the <see cref="UserRoles"/> navigation property.
 /// </summary>
 public sealed class Role : IdentityRole<int>, ISoftDeleteBaseEntity
 {
     /// <summary>
-    /// نقش های کاربر
+    /// Gets the collection of user-role relationships associated with this role.
     /// </summary>
     public List<UserRole> UserRoles { get; private set; } = [];
 

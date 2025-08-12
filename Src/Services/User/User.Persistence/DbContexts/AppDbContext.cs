@@ -22,7 +22,6 @@ public class AppDbContext : IdentityDbContext<UserAccount, Role, int, IdentityUs
         var entitiesAssembly = typeof(IBaseEntity).Assembly;
         modelBuilder.RegisterAllEntities<IBaseEntity>(entitiesAssembly);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(BaseEntityConfiguration<>).Assembly);
-        //modelBuilder.ApplyConfiguration(new UserAccountConfiguration());
         modelBuilder.ApplyConfiguration(new DeliveryDriverConfiguration());
 
         modelBuilder.IgnoreUnusedEntities();

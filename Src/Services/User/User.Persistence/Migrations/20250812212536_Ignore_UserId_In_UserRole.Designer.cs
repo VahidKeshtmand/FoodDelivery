@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using User.Persistence.DbContexts;
 
@@ -11,9 +12,11 @@ using User.Persistence.DbContexts;
 namespace User.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250812212536_Ignore_UserId_In_UserRole")]
+    partial class Ignore_UserId_In_UserRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -479,7 +482,7 @@ namespace User.Persistence.Migrations
 
                             b1.HasIndex("CustomerId");
 
-                            b1.ToTable("Address", (string)null);
+                            b1.ToTable("Address");
 
                             b1.WithOwner("Customer")
                                 .HasForeignKey("CustomerId");
@@ -497,7 +500,7 @@ namespace User.Persistence.Migrations
 
                                     b2.HasKey("AddressId");
 
-                                    b2.ToTable("Address", (string)null);
+                                    b2.ToTable("Address");
 
                                     b2.WithOwner()
                                         .HasForeignKey("AddressId");
@@ -527,7 +530,7 @@ namespace User.Persistence.Migrations
 
                             b1.HasKey("DeliveryDriverId");
 
-                            b1.ToTable("DeliveryDrivers", (string)null);
+                            b1.ToTable("DeliveryDrivers");
 
                             b1.WithOwner()
                                 .HasForeignKey("DeliveryDriverId");

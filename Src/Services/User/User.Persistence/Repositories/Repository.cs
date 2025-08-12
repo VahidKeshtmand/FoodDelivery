@@ -5,32 +5,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace User.Persistence.Repositories;
 
-internal class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
+internal class Repository<TEntity, TKey>(AppDbContext dbContext) : IRepository<TEntity, TKey>
     where TEntity : class, IBaseEntity<TKey>
 {
-    private readonly AppDbContext _dbContext;
+    public IQueryable<TEntity> QueryNoTracking => dbContext.Set<TEntity>().AsNoTracking();
 
-    public Repository(AppDbContext dbContext) {
-        _dbContext = dbContext;
-    }
+    public IQueryable<TEntity> Query => dbContext.Set<TEntity>().AsTracking();
 
-    public IQueryable<TEntity> QueryNoTracking => _dbContext.Set<TEntity>().AsNoTracking();
-
-    public IQueryable<TEntity> Query => _dbContext.Set<TEntity>().AsTracking();
-
-    public DbSet<TEntity> DbSet => _dbContext.Set<TEntity>();
+    public DbSet<TEntity> DbSet => dbContext.Set<TEntity>();
 
     public int SaveChanges() {
-        return _dbContext.SaveChanges();
+        return dbContext.SaveChanges();
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) {
-        return await _dbContext.SaveChangesAsync(cancellationToken);
+        return await dbContext.SaveChangesAsync(cancellationToken);
     }
 }
 
-internal class Repository<TEntity> : Repository<TEntity, int>, IRepository<TEntity>
-    where TEntity : class, IBaseEntity
-{
-    public Repository(AppDbContext dbContext) : base(dbContext) { }
-}
+internal class Repository<TEntity>(AppDbContext dbContext) : Repository<TEntity, int>(dbContext), IRepository<TEntity>
+    where TEntity : class, IBaseEntity;
