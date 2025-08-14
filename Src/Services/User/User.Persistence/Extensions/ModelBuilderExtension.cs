@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using User.Domain.Entities;
+using User.Persistence.Configurations;
+using User.Persistence.Interceptors;
 
 namespace User.Persistence.Extensions;
 
@@ -21,13 +23,31 @@ internal static class ModelBuilderExtension
         }
     }
 
-    public static void IgnoreUnusedEntities(this ModelBuilder modelBuilder) {
+    public static void RegisterMappingStrategies(this ModelBuilder modelBuilder) {
+        //modelBuilder.Entity<UserAccount>()
+        //    .UseTpcMappingStrategy();
 
+        //modelBuilder.Entity<DeliveryDriver>()
+        //    .UseTpcMappingStrategy();
+
+        //modelBuilder.Entity<RestaurantManger>()
+        //    .UseTpcMappingStrategy();
+    }
+
+    public static void RegisterConfigurations(this ModelBuilder modelBuilder) {
+        modelBuilder.ApplyConfiguration(new DeliveryDriverConfiguration());
+        modelBuilder.ApplyConfiguration(new CustomerConfiguration());
+        modelBuilder.ApplyConfiguration(new RestaurantMangerConfiguration());
+    }
+
+    public static void RegisterInterceptors(this DbContextOptionsBuilder optionsBuilder) {
+        optionsBuilder.AddInterceptors(new AuditInterceptor());
+    }
+
+    public static void IgnoreUnusedEntities(this ModelBuilder modelBuilder) {
         modelBuilder.Ignore<IdentityUserClaim<int>>();
         modelBuilder.Ignore<IdentityUserLogin<int>>();
         modelBuilder.Ignore<IdentityUserToken<int>>();
-
         modelBuilder.Ignore<IdentityRoleClaim<int>>();
-        modelBuilder.Ignore<UserAccount>();
     }
 }

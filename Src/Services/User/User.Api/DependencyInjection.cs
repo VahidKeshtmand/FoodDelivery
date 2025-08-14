@@ -1,46 +1,21 @@
-﻿using AutoMapper;
-//using FluentValidation.AspNetCore;
-using FluentValidation;
-using MediatR;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-//using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-//using User.Endpoint.ExceptionHandler;
-using Microsoft.OpenApi.Models;
-using System.Globalization;
-using System.Reflection;
-using System.Security.Claims;
-using System.Text;
-using User.Api.ExceptionHandler;
-using User.Application.Behaviors;
-using User.Application.Common.Mappings;
-using User.Application.Common.Models;
-using User.Application.Common.Models.BaseDtos;
-using User.Application.Common.Options;
-using User.Application.Common.StaticDatas;
-using User.Application.Common.Utilities;
-using User.Application.Options;
-using User.Domain.Entities;
-using User.Persistence.DbContexts;
-//using Carter;
+﻿using MassTransit;
+using User.Application.Features.Customers.Commands;
 
 namespace User.Api;
 
 /// <summary>
-/// تزریق وابستگی
+/// Provides extension methods for registering application services and dependencies in the dependency injection container.
 /// </summary>
 public static class DependencyInjection
 {
     /// <summary>
-    /// تزریق وابستگی پروژه Endpoint
+    /// Registers core application services, middleware, authentication, authorization, validation, and other dependencies required for the API.
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="configuration"></param>
-    /// <param name="assemblies"></param>
-    /// <returns></returns>
-    public static IServiceCollection AddEndpointServices(this IServiceCollection services, IConfiguration configuration, params Assembly[] assemblies)
-    {
+    /// <param name="services">The service collection to which services will be added.</param>
+    /// <param name="configuration">The application configuration instance.</param>
+    /// <param name="assemblies">Assemblies to be used for service registration, such as for AutoMapper or MediatR.</param>
+    /// <returns>The updated <see cref="IServiceCollection"/> instance.</returns>
+    public static IServiceCollection AddEndpointServices(this IServiceCollection services, IConfiguration configuration, params Assembly[] assemblies) {
 
         services.AddHttpContextAccessor();
 
@@ -63,7 +38,7 @@ public static class DependencyInjection
 
         #region Register FluentValidation
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
-        .AddValidatorsFromAssemblyContaining(typeof(BaseValidator<>));
+            .AddValidatorsFromAssemblyContaining(typeof(BaseValidator<>));
 
         ValidatorOptions.Global.LanguageManager.Enabled = true;
         ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("fa");
@@ -73,6 +48,7 @@ public static class DependencyInjection
         services.AddAutoMapper(config =>
         {
             config.AddCustomMappingProfile();
+            config.CreateMap<RegisterCustomerCommand, Customer>();
         }, assemblies);
         #endregion
 
@@ -132,8 +108,14 @@ public static class DependencyInjection
         services.Configure<TemplateBackgroundServiceOptions>(configuration.GetSection(nameof(TemplateBackgroundServiceOptions)));
         services.Configure<InMemoryCacheOptions>(configuration.GetSection(nameof(InMemoryCacheOptions)));
         services.Configure<BaseExternalServiceOptions>(configuration.GetSection(nameof(BaseExternalServiceOptions)));
-        services.Configure<TemplateExternalServiceOptions>(configuration.GetSection(nameof(TemplateExternalServiceOptions))); 
+        services.Configure<TemplateExternalServiceOptions>(configuration.GetSection(nameof(TemplateExternalServiceOptions)));
         #endregion
+
+        services.AddMassTransit(options => {
+            options.UsingRabbitMq((context, config) => {
+                config.Host(configuration.GetValue<string>("EventBusSetting:HostAddress"));
+            });
+        });
 
         return services;
     }

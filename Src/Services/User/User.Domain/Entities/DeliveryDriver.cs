@@ -29,4 +29,5 @@ public sealed class DeliveryDriver : UserAccount
     /// Gets or sets the current geographic location of the driver.
     /// </summary>
     public required GeoLocation Location { get; set; }
+
 }

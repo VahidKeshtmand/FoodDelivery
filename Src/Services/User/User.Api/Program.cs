@@ -1,30 +1,36 @@
-using User.Api;
-using User.Application;
-using User.Persistence;
+using Scalar.AspNetCore;
+using User.Api.Extensions;
+using User.Infrastructure;
+using User.Persistence.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
 builder.Services.AddEndpointServices(builder.Configuration);
 builder.Services.AddApplicationServices(builder.Configuration);
-//builder.Services.AddInfrastructureServices();
 builder.Services.AddPersistenceServices(builder.Configuration);
+builder.Services.AddInfrastructureServices();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+if ( app.Environment.IsDevelopment() ) {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.UseExceptionHandler();
+
 app.MapControllers();
+
+app.MigrateDatabase<AppDbContext>((context, services) => {
+    var logger = services.GetService<ILogger<UserContextSeed>>();
+    var userManager = services.GetService<UserManager<UserAccount>>();
+    UserContextSeed.SeedAsync(userManager!, logger!).Wait();
+}).Run();
 
 app.Run();

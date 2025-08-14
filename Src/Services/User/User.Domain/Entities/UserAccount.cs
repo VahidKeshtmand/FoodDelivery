@@ -12,12 +12,12 @@ public abstract class UserAccount : IdentityUser<int>, ISoftDeleteBaseEntity
     /// <summary>
     /// Gets or sets the user's first name.
     /// </summary>
-    public required string FirstName { get; set; }
+    public string FirstName { get; set; }
 
     /// <summary>
     /// Gets or sets the user's last name.
     /// </summary>
-    public required string LastName { get; set; }
+    public string LastName { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the user is active.
@@ -32,8 +32,7 @@ public abstract class UserAccount : IdentityUser<int>, ISoftDeleteBaseEntity
     /// <summary>
     /// Removes all roles assigned to the user.
     /// </summary>
-    public void DeleteRoles()
-    {
+    public void DeleteRoles() {
         UserRoles.Clear();
     }
 
@@ -41,10 +40,10 @@ public abstract class UserAccount : IdentityUser<int>, ISoftDeleteBaseEntity
     /// Assigns a new role to the user.
     /// </summary>
     /// <param name="role">The role to add.</param>
-    public void AddRole(UserRole role)
-    {
+    public void AddRole(UserRole role) {
         UserRoles.Add(role);
     }
+
     #region BaseEntity
     /// <summary>
     /// Gets the date and time when the entity was created.
@@ -82,6 +81,14 @@ public abstract class UserAccount : IdentityUser<int>, ISoftDeleteBaseEntity
     public void Create(int userId) {
         Created = DateTime.Now;
         CreatedBy = userId;
+    }
+
+    /// <summary>
+    /// Sets the audit fields for creation using the given user ID.
+    /// </summary>
+    public void Create() {
+        Created = DateTime.Now;
+        CreatedBy = null;
     }
     #endregion
 

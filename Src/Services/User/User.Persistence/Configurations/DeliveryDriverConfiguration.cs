@@ -24,36 +24,6 @@ internal sealed class DeliveryDriverConfiguration : IEntityTypeConfiguration<Del
             .HasMaxLength(200)
             .IsRequired();
 
-        builder.Property(x => x.UserName)
-            .HasMaxLength(100)
-            .IsRequired();
-
-        builder.Property(x => x.Email)
-            .HasMaxLength(100)
-            .IsRequired();
-
-        builder.Property(x => x.NormalizedEmail)
-            .HasMaxLength(100);
-
-        builder.Property(x => x.PasswordHash)
-            .HasMaxLength(1000)
-            .IsRequired();
-
-        builder.Property(x => x.SecurityStamp)
-            .HasMaxLength(2000);
-
-        builder.Property(x => x.ConcurrencyStamp)
-            .HasMaxLength(2000);
-
-        builder.Property(x => x.PhoneNumber)
-            .HasMaxLength(11)
-            .IsRequired();
-
-        builder.HasMany(e => e.UserRoles)
-            .WithOne(x => x.DeliveryDriver)
-            .HasForeignKey(x => x.DeliveryDriverId)
-            .IsRequired();
-
         builder.OwnsOne(x => x.Location);
     }
 }

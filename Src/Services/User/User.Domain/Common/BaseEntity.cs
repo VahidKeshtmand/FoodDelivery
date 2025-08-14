@@ -8,7 +8,7 @@
 public abstract class BaseEntity<TKey> : IBaseEntity<TKey>
 {
     /// <inheritdoc/>
-    public required TKey Id { get; set; }
+    public TKey Id { get; set; }
 
     /// <inheritdoc/>
     public DateTime Created { get; private set; }

@@ -20,39 +20,6 @@ internal sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .HasMaxLength(200)
             .IsRequired();
 
-        builder.Property(x => x.UserName)
-            .HasMaxLength(100)
-            .IsRequired();
-
-        builder.Property(x => x.Email)
-            .HasMaxLength(100)
-            .IsRequired();
-
-        builder.Property(x => x.NormalizedEmail)
-            .HasMaxLength(100);
-
-        builder.Property(x => x.PasswordHash)
-            .HasMaxLength(1000)
-            .IsRequired();
-
-        builder.Property(x => x.SecurityStamp)
-            .HasMaxLength(2000);
-
-        builder.Property(x => x.ConcurrencyStamp)
-            .HasMaxLength(2000);
-
-        builder.Property(x => x.PhoneNumber)
-            .HasMaxLength(11)
-            .IsRequired();
-
-        builder.HasMany(e => e.UserRoles)
-            .WithOne(x => x.Customer)
-            .HasForeignKey(x => x.CustomerId)
-            .IsRequired();
-
-        builder.HasQueryFilter(x =>
-            x.Addresses.Any(y => !y.IsDeleted));
-
         builder.OwnsMany(x => x.Addresses, x => {
             x.Property(y => y.Street)
                 .HasMaxLength(100);

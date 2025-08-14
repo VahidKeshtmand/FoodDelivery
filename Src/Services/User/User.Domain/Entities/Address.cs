@@ -40,7 +40,8 @@ public sealed class Address
     /// <summary>
     /// Gets or sets the customer with OwnsMany relation.
     /// </summary>
-    public required Customer Customer { get; set; }
+    public Customer Customer { get; set; }
+
 
     #region BaseEntity
     /// <summary>

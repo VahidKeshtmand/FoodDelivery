@@ -2,7 +2,6 @@
 using MediatR;
 using User.Application.Common.Exceptions;
 using User.Application.Common.Models;
-using User.Domain.Entities;
 
 namespace User.Application.Behaviors;
 
