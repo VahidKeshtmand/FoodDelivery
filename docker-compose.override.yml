@@ -1,5 +1,5 @@
 services:
-  userdb:
+  usersdb:
     container_name: userdb
     environment:
       SA_PASSWORD: Vahid97101245
@@ -13,13 +13,13 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
-  user.api:
+  users.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - DatabaseOptions:ConnectionStrings:AppDbContext=Data Source=userdb;Initial Catalog=UserDb;User ID=sa;Password=Vahid97101245;TrustServerCertificate=True;
+      - DatabaseOptions:ConnectionStrings:AppDbContext=Data Source=usersdb;Initial Catalog=UserDb;User ID=sa;Password=Vahid97101245;TrustServerCertificate=True;
       - EventBusSetting:HostAddress=amqp://guest:guest@rabbitmq:5672
     depends_on:
-      - userdb
+      - usersdb
       - rabbitmq 
     ports:
       - "8001:8080"
