@@ -27,10 +27,10 @@ app.UseExceptionHandler();
 
 app.MapControllers();
 
-app.MigrateDatabase<AppDbContext>((context, services) => {
-    var logger = services.GetService<ILogger<UserContextSeed>>();
-    var userManager = services.GetService<UserManager<UserAccount>>();
-    UserContextSeed.SeedAsync(userManager!, logger!).Wait();
-}).Run();
+//app.MigrateDatabase<AppDbContext>((context, services) => {
+//    var logger = services.GetService<ILogger<UserContextSeed>>();
+//    var userManager = services.GetService<UserManager<UserAccount>>();
+//    UserContextSeed.SeedAsync(userManager!, logger!).Wait();
+//}).Run();
 
 app.Run();

@@ -55,7 +55,7 @@ public sealed record RegisterCustomerCommand : IRequest<int>
     /// <summary>
     /// Gets the customer's date of birth.
     /// </summary>
-    public DateTime BirthDate { get; init; }
+    public DateTime? BirthDate { get; init; }
 }
 
 internal sealed class RegisterCustomerCommandHandler(

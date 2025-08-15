@@ -28,21 +28,9 @@ public static class DependencyInjection
         services.AddProblemDetails();
         #endregion
 
-        #region Register MediatR
-        services.AddMediatR(opts =>
-        {
-            opts.RegisterServicesFromAssemblyContaining<IBaseDto>();
-            opts.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-        });
-        #endregion
 
-        #region Register FluentValidation
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
-            .AddValidatorsFromAssemblyContaining(typeof(BaseValidator<>));
 
-        ValidatorOptions.Global.LanguageManager.Enabled = true;
-        ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("fa");
-        #endregion
+
 
         #region Register AutoMapper
         services.AddAutoMapper(config =>

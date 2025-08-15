@@ -5,12 +5,15 @@ using User.Application.Common.Models;
 
 namespace User.Application.Behaviors;
 
-public sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TResponse>> validators)
+public sealed class ValidationBehavior<TRequest, TResponse>(
+    IEnumerable<IValidator<TRequest>> validators)
     : IPipelineBehavior<TRequest, TResponse>
 {
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken) {
         var context = new ValidationContext<TRequest>(request);
-        var validationFailure = await Task.WhenAll(validators.Select(x => x.ValidateAsync(context, cancellationToken)));
+
+        var validationFailure = await Task.WhenAll(validators
+            .Select(x => x.ValidateAsync(context, cancellationToken)));
 
         var errors = validationFailure
             .Where(x => !x.IsValid)

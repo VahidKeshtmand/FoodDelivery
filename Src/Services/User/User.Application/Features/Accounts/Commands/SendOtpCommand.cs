@@ -1,8 +1,6 @@
 ﻿using MassTransit;
 using MediatR;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
-using System;
 using User.Application.Common.Models.BaseDtos;
 using User.Application.Features.Accounts.Dtos;
 using User.Application.Interfaces;
@@ -32,7 +30,7 @@ internal sealed class SendOtpCodeCommandHandler (
             ExpireAt = DateTime.UtcNow.AddMinutes(2),
         };
 
-        var sd = repository.DbSet.Add(otp);
+        repository.DbSet.Add(otp);
 
         await repository.SaveChangesAsync(cancellationToken);
 
